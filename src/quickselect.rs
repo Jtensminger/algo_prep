@@ -6,7 +6,6 @@ use rand::Rng;
 pub fn quick_select<T: PartialOrd + Copy> (slice: &mut [T], k_smallest: usize) -> &T {
         if slice.len() == 1 { return &slice[0] }
         let mut pivot_index = rand::thread_rng().gen_range(0..slice.len());
-        // let mut pivot_index = 0;
         pivot_index = partition_in_place(slice, pivot_index); /* after partitioning, [Left | Pivot | Right] */
         return match k_smallest.cmp(&pivot_index) {  /* after partioning, we can now tell if k lives on the left or right side of the slice */
                 Ordering::Equal => &slice[k_smallest],                        /* Success! */
