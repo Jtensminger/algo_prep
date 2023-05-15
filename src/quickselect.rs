@@ -1,6 +1,47 @@
+use std::cmp::Ordering;
+use crate::partition_in_place;
+use rand::Rng;
+
 // /* QuickSelect finds the k-th smallest element in an unordered list. */
+pub fn quick_select<T: PartialOrd + Copy> (slice: &mut [T], k_smallest: usize) -> &T {
+        if slice.len() == 1 { return &slice[0] }
+        let mut pivot_index = rand::thread_rng().gen_range(0..slice.len());
+        // let mut pivot_index = 0;
+        pivot_index = partition_in_place(slice, pivot_index); /* after partitioning, [Left | Pivot | Right] */
+        return match k_smallest.cmp(&pivot_index) {  /* after partioning, we can now tell if k lives on the left or right side of the slice */
+                Ordering::Equal => &slice[k_smallest],                        /* Success! */
+                /* When the k-th smallest element is in the left partition,
+                         you don't need to change the value of k_smallest because the indices in the left partition are the same as the original array. */
+                Ordering::Less => quick_select(&mut slice[..pivot_index], k_smallest),    /* [k_smallest is Left | Pivot ] */ 
+                /* However, when the k-th smallest element is in the right partition,
+                        you need to adjust the value of k_smallest because the right partition is now a new slice with different indices.
+                        Specifically, the new slice starts at the index pivot_index + 1 of the original array,
+                        so the relative index of the k-th smallest element in the right partition will be different from its index in the original array. */
+                Ordering::Greater => quick_select(&mut slice[pivot_index + 1..], k_smallest - pivot_index - 1), /* [ Pivot | k_smallest is Right ] */
+        }
+}
+
+#[cfg(test)]
+mod tests {
+        use super::*;
+
+        #[test]
+        fn it_works() {
+                let ref mut slice = vec![7,6,5,4,3,2];
+                assert_eq!(&2, quick_select(slice, 0));
+                assert_eq!(&3, quick_select(slice, 1));
+                assert_eq!(&4, quick_select(slice, 2));
+                assert_eq!(&5, quick_select(slice, 3));
+        }
+}
 
 
+/* 
+// High-level Logic:
+        1) Choose a pivot element from the list (often chosen randomly or using a specific strategy).
+        2) Partition the list around the pivot, such that elements smaller than the pivot come before it, and elements larger than the pivot come after it.
+        3) Depending on the position of the pivot and the desired k-th element, recursively perform steps 1 and 2 on the appropriate partition.
+*/
 
 
 // use rand::Rng;
@@ -49,34 +90,3 @@
 // pub fn quick_select<T: Ord + Clone>(list: &mut [T], k: usize) -> T {
 //         quick_select_recurse(list, k)
 // }
-
-
-
-// #[cfg(test)]
-// mod tests {
-//         use super::*;
-
-//         #[test]
-//         fn it_works() {
-//                 let mut slice = vec![6,5,3,2,4,0,7];
-//                 let (low, high) = (0, slice.len()-1);
-//                 partition(&mut slice, low, high, high);
-//                 // assert_eq!(vec![0,2,3,7,4,6,5], slice);
-//                 dbg!(slice);
-//         }
-// }
-
-
-// /* 
-// High-level Logic:
-//         1) Choose a pivot element from the list (often chosen randomly or using a specific strategy).
-//         2) Partition the list around the pivot, such that elements smaller than the pivot come before it, and elements larger than the pivot come after it.
-//         3) Depending on the position of the pivot and the desired k-th element, recursively perform steps 1 and 2 on the appropriate partition.
-
-// Notes:
-//         It's very useful in finding the k-th smallest element without sorting the entire list.
-//         Common Use Cases:
-//                 Finding the median of a dataset,
-//                 Selecting top-k elements in a ranking system, or
-//                 Calculating percentiles in statistical analysis.
-// */
