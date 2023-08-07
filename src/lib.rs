@@ -6,3 +6,6 @@ pub use quickselect::*;
 
 pub mod quicksort;
 pub use quicksort::*;
+
+pub mod binarysearch;
+pub use binarysearch::*;
