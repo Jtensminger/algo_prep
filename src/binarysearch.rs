@@ -1,6 +1,6 @@
 /* item not in slice == Err(idx) */
 /* item found == Ok(idx) */
-fn binary_search<T: Ord + Copy> (slice: &[T], target: &T) -> Result<usize, usize> {
+pub fn binary_search<T: Ord + Copy> (slice: &[T], target: &T) -> Result<usize, usize> {
         binary_search_helper(slice, target, 0)
 }
 fn binary_search_helper<T: Ord + Copy> (slice: &[T], target: &T, offset: usize) -> Result<usize, usize> {
